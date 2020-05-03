@@ -16,249 +16,36 @@
     <!-- initialize the SDK after all desired features are loaded -->
     <script defer src="/__/firebase/init.js"></script>
 
-    <style media="screen">
-        body {
-            background: #ECEFF1;
-            color: rgba(0, 0, 0, 0.87);
-            font-family: Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
+    <link rel="stylesheet" type="text/css" href="main.css">
 
-        #message {
-            background: white;
-            max-width: 360px;
-            margin: 100px auto 16px;
-            padding: 32px 24px;
-            border-radius: 3px;
-        }
-
-        #message h2 {
-            color: #ffa100;
-            font-weight: bold;
-            font-size: 16px;
-            margin: 0 0 8px;
-        }
-
-        #message h1 {
-            font-size: 22px;
-            font-weight: 300;
-            color: rgba(0, 0, 0, 0.6);
-            margin: 0 0 16px;
-        }
-
-        #message p {
-            line-height: 140%;
-            margin: 16px 0 24px;
-            font-size: 14px;
-        }
-
-        #message a {
-            display: block;
-            text-align: center;
-            background: #039be5;
-            text-transform: uppercase;
-            text-decoration: none;
-            color: white;
-            padding: 16px;
-            border-radius: 4px;
-        }
-
-        #message, #message a {
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-        }
-
-        #load {
-            color: rgba(0, 0, 0, 0.4);
-            text-align: center;
-            font-size: 13px;
-        }
-
-        @media (max-width: 600px) {
-            body, #message {
-                margin-top: 0;
-                background: white;
-                box-shadow: none;
-            }
-
-            body {
-                border-top: 16px solid #ffa100;
-            }
-        }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: 140px 140px 140px;
-            padding: 100px;
-        }
-
-        .grid-item {
-            background-color: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(0, 0, 0, 0.8);
-            width: 100px;
-            height: 100px;
-            padding: 20px;
-            font-size: 30px;
-            text-align: center;
-        }
-
-        div.ximage {
-            background-image: url("https://s3.amazonaws.com/static.graphemica.com/glyphs/i500s/000/002/004/original/0058-500x500.png?1275291789");
-            background-size: contain;
-            margin: auto;
-        }
-
-        div.oimage {
-            background-image: url("https://pluspng.com/img-png/letter-o-png-open-2000.png");
-            background-size: contain;
-            margin: auto;
-        }
-
-    </style>
 </head>
 <body>
 <div id="message">
-    <h2>Welcome</h2>
-    <input placeholder="ENTER NAME!" id="playerName" onkeypress="handleEnterName(event)">
-
-    <span id="displayName" />
-    <div id="gameGrid" style="visibility:hidden;">
+    <div id="new-player">
+        <input placeholder="ENTER NAME!" id="player-name" onkeypress="handleEnterName(event)">
     </div>
-    <div class="grid-container">
-        <div class="grid-item" id="div1" onclick="myFunction('div1')"></div>
-        <div class="grid-item" id="div2" onclick="myFunction('div2')"></div>
-        <div class="grid-item" id="div3" onclick="myFunction('div3')"></div>
-        <div class="grid-item" id="div4" onclick="myFunction('div4')"></div>
-        <div class="grid-item" id="div5" onclick="myFunction('div5')"></div>
-        <div class="grid-item" id="div6" onclick="myFunction('div6')"></div>
-        <div class="grid-item" id="div7" onclick="myFunction('div7')"></div>
-        <div class="grid-item" id="div8" onclick="myFunction('div8')"></div>
-        <div class="grid-item" id="div9" onclick="myFunction('div9')"></div>
+    <div id="player-name-display" style="display:none;">
+        Welcome: <span id="display-name"></span>
     </div>
-
+    <div id="open-games" style="display:none;">
+        <div id="open-games-tbl"></div>
+    </div>
+    <div id="game-grid" style="display:none;">
+        <div class="grid-container">
+            <div class="grid-item" id="div1" onclick="myFunction('div1')"></div>
+            <div class="grid-item" id="div2" onclick="myFunction('div2')"></div>
+            <div class="grid-item" id="div3" onclick="myFunction('div3')"></div>
+            <div class="grid-item" id="div4" onclick="myFunction('div4')"></div>
+            <div class="grid-item" id="div5" onclick="myFunction('div5')"></div>
+            <div class="grid-item" id="div6" onclick="myFunction('div6')"></div>
+            <div class="grid-item" id="div7" onclick="myFunction('div7')"></div>
+            <div class="grid-item" id="div8" onclick="myFunction('div8')"></div>
+            <div class="grid-item" id="div9" onclick="myFunction('div9')"></div>
+        </div>
+    </div>
 
 </div>
 <p id="load">Firebase SDK Loading&hellip;</p>
-
-<script>
-
-
-
-    document.addEventListener('DOMContentLoaded', function () {
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-
-        try {
-            let app = firebase.app();
-            let features = ['firestore', 'auth', 'database', 'messaging', 'storage'].filter(feature => typeof app[feature] === 'function'
-                )
-            ;
-            document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-            console.error(e);
-            document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
-        }
-        console.log('in here 1');
-        firebase.firestore().collection("games").where("status", "==", "open")
-            .onSnapshot(function (querySnapshot) {
-                var games = new Map();
-                querySnapshot.forEach(function (doc) {
-                    games.set(doc.id, doc.data());
-                });
-                console.log("Current games in CA: ", games);
-                tableCreate(games);
-            });
-    });
-
-    let is_x = true;
-    let player;
-    // let gridEl = document.getElementById('gameGrid');
-    // gridEl.style.visibility = 'hidden';
-
-    function handleEnterName(e) {
-        if(e.which === 13){
-            let inputEl = document.getElementById('playerName');
-            initialisePlayer(inputEl.value);
-        }
-    }
-
-    function initialisePlayer(name) {
-        console.log('initialise player', name);
-        player = name;
-        let displayNameEl = document.getElementById('displayName');
-        displayNameEl.innerHTML = name;
-        loadGrid();
-    }
-
-    function loadGrid() {
-        console.log('loadGrid');
-        let gridEl = document.getElementById('gameGrid');
-        console.log('sssss', gridEl);
-        gridEl.style.visibility = 'visible';
-    }
-
-    function myFunction(divID) {
-        var element = document.getElementById(divID);
-        if (is_x) {
-            element.classList.toggle("ximage");
-        } else {
-            element.classList.toggle("oimage");
-        }
-        is_x = !is_x;
-    }
-
-    function updateGames(game, key, tbl) {
-        console.log(`m[${key}] = ${game}`);
-        var tr = tbl.insertRow();
-        for (var j = 0; j < 2; j++) {
-            var td = tr.insertCell();
-            //td.appendChild(document.createTextNode('Cell'));
-            var button = document.createElement('button');
-            button.innerHTML = 'join';
-            button.setAttribute('data-id', key);
-
-            button.onclick = function () {
-                console.log('her', this.getAttribute('data-id'));
-
-                return false;
-            };
-            td.appendChild(button);
-            td.style.border = '1px solid black';
-            if (j == 0) {
-                td.innerHTML = game.xuser;
-            }
-        }
-    }
-
-    function tableCreate(games) {
-        console.log("games", games)
-        var removeTab = document.getElementById('gamesTbl');
-        if (removeTab !== null) {
-            var parentEl = removeTab.parentElement;
-
-            parentEl.removeChild(removeTab);
-        }
-
-        var body = document.body,
-            tbl = document.createElement('table');
-        tbl.style.width = '100px';
-        tbl.style.border = '1px solid black';
-
-        tbl.setAttribute("id", "gamesTbl");
-        for (const [key, value] of games.entries()) {
-            updateGames(value, key, tbl)
-        }
-
-
-        body.appendChild(tbl);
-    }
-</script>
 </body>
+<script src="main.js"></script>
 </html>
