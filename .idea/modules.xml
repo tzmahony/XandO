@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/xando.iml" filepath="$PROJECT_DIR$/xando.iml" />
+      <module fileurl="file://$PROJECT_DIR$/XandO.iml" filepath="$PROJECT_DIR$/XandO.iml" />
     </modules>
   </component>
 </project>

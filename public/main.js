@@ -53,6 +53,11 @@ function loadOpenGames() {
     console.log('openGamesEl:', openGamesEl);
     openGamesEl.style.display = 'block';
 
+
+    let createGameEl = document.getElementById('create-game-link');
+    console.log('createGameEl:', createGameEl);
+    createGameEl.style.display = 'block';
+
     firebase.firestore().collection("games").where("status", "==", "open")
       .onSnapshot(function (querySnapshot) {
           var games = new Map();
@@ -151,4 +156,21 @@ function loadGrid() {
     let gridEl = document.getElementById('game-grid');
     console.log('gameGridEl:', gridEl);
     gridEl.style.display = 'block';
+}
+
+function createGame(){
+    console.log("createGame");
+    // Add a new document with a generated id.
+    firebase.firestore().collection("games").add({
+        xuser: activePlayer,
+        status: 'open',
+        turn: 'xuser'
+    })
+        .then(function(docRef) {
+            console.log("Document written with ID: ", docRef.id);
+        })
+        .catch(function(error) {
+            console.error("Error adding document: ", error);
+        });
+
 }
