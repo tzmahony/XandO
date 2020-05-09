@@ -1,5 +1,8 @@
 let is_x = true;
 let activePlayer;
+let playerTurn;
+let gameId;
+let cellState;
 
 document.addEventListener('DOMContentLoaded', function () {
     // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
@@ -91,14 +94,40 @@ function updateOpenGamesTable(games) {
     openGamesTblEl.appendChild(tblEl);
 }
 
+function getCellChosen(cellId) {
+    return cellId.substr(3);
+
+}
+
 function myFunction(divID) {
-    var element = document.getElementById(divID);
-    if (is_x) {
-        element.classList.toggle("ximage");
-    } else {
-        element.classList.toggle("oimage");
+    if (playerUser=== activePlayer) {
+        var gamesRef = firebase.firestore().collection("games").doc(gameId);
+
+        cellState[getCellChosen(divID) -1]='xuser';
+        return gamesRef.update({
+            grid: cellState
+        })
+            .then(function () {
+                console.log("Document successfully updated!");
+
+
+                var element = document.getElementById(divID);
+                if (is_x) {
+                    element.classList.toggle("ximage");
+                } else {
+                    element.classList.toggle("oimage");
+                }
+
+                playerUser="";
+                is_x = !is_x;
+
+            })
+            .catch(function (error) {
+                // The document probably doesn't exist.
+                console.error("Error updating document: ", error);
+            });
+
     }
-    is_x = !is_x;
 }
 
 function updateOpenGamesRow(game, key, tbl) {
@@ -168,9 +197,28 @@ function createGame(){
     })
         .then(function(docRef) {
             console.log("Document written with ID: ", docRef.id);
+            let openGamesTblEl = document.getElementById('open-games-tbl');
+            let createGameLinkEl = document.getElementById('create-game-link');
+            let gameGridEl = document.getElementById('game-grid');
+            openGamesTblEl.style.display='none';
+            createGameLinkEl.style.display='none';
+            gameGridEl.style.display='block';
+
+            setCurrentUser(activePlayer);
+            playerTurn= activePlayer;
+            gameId=docRef.id;
+            cellState=docRef.data.grid;
+
+
         })
         .catch(function(error) {
             console.error("Error adding document: ", error);
         });
+
+}
+
+function setCurrentUser(userName){
+    let usersTurnEl = document.getElementById('users-turn');
+    usersTurnEl.innerText=userName;
 
 }
