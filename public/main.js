@@ -1,8 +1,10 @@
-let is_x = true;
 let activePlayer;
 let playerTurn;
 let gameId;
-let cellState;
+let cellState=['', '', '', '', '', '', '', '', ''];
+let userType;
+let haveBothPlayers = false;
+let currentUsersTurn;
 
 document.addEventListener('DOMContentLoaded', function () {
     // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
@@ -56,7 +58,6 @@ function loadOpenGames() {
     console.log('openGamesEl:', openGamesEl);
     openGamesEl.style.display = 'block';
 
-
     let createGameEl = document.getElementById('create-game-link');
     console.log('createGameEl:', createGameEl);
     createGameEl.style.display = 'block';
@@ -94,33 +95,67 @@ function updateOpenGamesTable(games) {
     openGamesTblEl.appendChild(tblEl);
 }
 
-function getCellChosen(cellId) {
-    return cellId.substr(3);
-
+function hasPlayerWon() {
+    if (cellState[0] === userType && cellState[1] === userType && cellState[2] === userType) {
+        return true
+    } else if (cellState[0] === userType && cellState[3] === userType && cellState[6] === userType) {
+        return true;
+    } else if (cellState[0] === userType && cellState[4] === userType && cellState[8] === userType) {
+        return true;
+    } else if (cellState[1] === userType && cellState[4] === userType && cellState[7] === userType) {
+        return true;
+    } else if (cellState[2] === userType && cellState[5] === userType && cellState[8] === userType) {
+        return true;
+    } else if (cellState[2] === userType && cellState[4] === userType && cellState[6] === userType) {
+        return true;
+    } else if (cellState[3] === userType && cellState[4] === userType && cellState[5] === userType) {
+        return true;
+    } else if (cellState[6] === userType && cellState[7] === userType && cellState[8] === userType) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
-function myFunction(divID) {
-    if (playerUser=== activePlayer) {
+function getCellChosen(cellId) {
+    return cellId.substr(3);
+}
+
+function isEmptyCell(cellIndex) {
+    return cellState[cellIndex] === '';
+}
+
+function setNextPlayer() {
+    if (playerTurn === 'xuser') {
+        playerTurn = 'ouser';
+    } else {
+        playerTurn = 'xuser';
+    }
+}
+
+function onClickGameCell(divID) {
+    const cellIndex = getCellChosen(divID) -1;
+    console.log('in onClickGameCell-currentUsersTurn + activePlayer', currentUsersTurn, activePlayer)
+    if (currentUsersTurn===activePlayer && isEmptyCell(cellIndex)) {
         var gamesRef = firebase.firestore().collection("games").doc(gameId);
 
-        cellState[getCellChosen(divID) -1]='xuser';
+        setNextPlayer();
+        console.log('updated next player', playerTurn);
+
+        console.log('cellIndex:', cellIndex);
+        cellState[cellIndex]=userType;
         return gamesRef.update({
-            grid: cellState
+            grid: cellState,
+            turn: playerTurn
         })
             .then(function () {
                 console.log("Document successfully updated!");
 
-
-                var element = document.getElementById(divID);
-                if (is_x) {
-                    element.classList.toggle("ximage");
-                } else {
-                    element.classList.toggle("oimage");
+                drawXorO(userType, divID);
+                if (hasPlayerWon()) {
+                    console.log('congrats you have won');
+                    endGame();
                 }
-
-                playerUser="";
-                is_x = !is_x;
-
             })
             .catch(function (error) {
                 // The document probably doesn't exist.
@@ -128,6 +163,33 @@ function myFunction(divID) {
             });
 
     }
+}
+
+function drawXorO(userType, cellId) {
+    var element = document.getElementById(cellId);
+    if (userType === 'xuser') {
+        element.classList.toggle("ximage");
+    } else {
+        element.classList.toggle("oimage");
+    }
+}
+
+function endGame() {
+    toggleDiv('game-grid');
+    toggleDiv('end-game');
+    let endGameMessageEl = document.getElementById('end-game-message');
+    endGameMessageEl.innerHTML = 'Congratulations you WON!';
+    var gamesRef = firebase.firestore().collection("games").doc(gameId);
+
+    return gamesRef.update({
+        status: 'ended'
+    })
+      .then(function () {
+          console.log("Document successfully updated ended!");
+      })
+      .catch(function (error) {
+          console.error("Error updating document: ", error);
+      });
 }
 
 function updateOpenGamesRow(game, key, tbl) {
@@ -161,15 +223,25 @@ function joinGame(playerIdToJoin) {
 
         return gamesRef.update({
             ouser: activePlayer,
-            status: 'closed'
+            status: 'started'
         })
           .then(function () {
-              console.log("Document successfully updated!");
+              console.log("jpin game Document successfully updated!");
 
-              // let openGamesEl = document.getElementById('open-games');
-              // openGamesEl.style.display = 'none';
+              toggleDiv('open-games-tbl');
+              toggleDiv('create-game-link');
+
               loadGrid();
 
+              setCurrentUser('X user');
+              playerTurn='xuser';
+
+              gameId=playerIdToJoin;
+              userType = 'yuser';
+              cellState=['', '', '', '', '', '', '', '', ''];
+              haveBothPlayers = true;
+
+              setupListenerPushNotifications();
           })
           .catch(function (error) {
               // The document probably doesn't exist.
@@ -180,11 +252,31 @@ function joinGame(playerIdToJoin) {
     }
 }
 
+function toggleDiv(divId) {
+    console.log('toggling div', divId);
+    let divEl = document.getElementById(divId);
+    if (divEl.style.display === 'none') {
+        divEl.style.display = 'block';
+    } else {
+        divEl.style.display = 'none';
+    }
+}
+
+function hideDiv(divId) {
+    console.log('hiding div', divId);
+    let divEl = document.getElementById(divId);
+    divEl.style.display = 'none';
+}
+
+function showDiv(divId) {
+    console.log('showing div', divId);
+    let divEl = document.getElementById(divId);
+    divEl.style.display = 'block';
+}
+
 function loadGrid() {
     console.log('loadGrid');
-    let gridEl = document.getElementById('game-grid');
-    console.log('gameGridEl:', gridEl);
-    gridEl.style.display = 'block';
+    toggleDiv('game-grid');
 }
 
 function createGame(){
@@ -196,20 +288,19 @@ function createGame(){
         turn: 'xuser'
     })
         .then(function(docRef) {
-            console.log("Document written with ID: ", docRef.id);
-            let openGamesTblEl = document.getElementById('open-games-tbl');
-            let createGameLinkEl = document.getElementById('create-game-link');
-            let gameGridEl = document.getElementById('game-grid');
-            openGamesTblEl.style.display='none';
-            createGameLinkEl.style.display='none';
-            gameGridEl.style.display='block';
+            console.log("created new game. Document written with ID: ", docRef.id);
+
+            toggleDiv('open-games-tbl');
+            toggleDiv('create-game-link');
+            toggleDiv('waiting-div');
 
             setCurrentUser(activePlayer);
-            playerTurn= activePlayer;
+            playerTurn='xuser';
             gameId=docRef.id;
-            cellState=docRef.data.grid;
-
-
+            userType = 'xuser';
+            cellState=['', '', '', '', '', '', '', '', ''];
+            haveBothPlayers = false;
+            setupListenerPushNotifications();
         })
         .catch(function(error) {
             console.error("Error adding document: ", error);
@@ -218,7 +309,62 @@ function createGame(){
 }
 
 function setCurrentUser(userName){
+    console.log('setCurrentUser:', userName);
     let usersTurnEl = document.getElementById('users-turn');
-    usersTurnEl.innerText=userName;
+    console.log('usersTurnEl.........:', usersTurnEl);
+    usersTurnEl.textContent=userName;
+    currentUsersTurn = userName;
 
 }
+
+function getUsersSelectedCell(dbGridCellState ) {
+    if (dbGridCellState) {
+        let i;
+        for (i = 0; i < dbGridCellState.length; i++) {
+            if (dbGridCellState[i] !== cellState[i]) {
+                return i + 1;
+            }
+        }
+    }
+    return -1;
+}
+
+function setupListenerPushNotifications() {
+    console.log('setupListenerPushNotifications', gameId);
+    firebase.firestore().collection("games").doc(gameId)
+      .onSnapshot(function(doc) {
+          console.log("received update to game:", doc.data());
+          if (doc.data().ouser && doc.data().xuser) {
+              haveBothPlayers = true;
+              console.log('have both players, this players user type is:', userType);
+              hideDiv('waiting-div');
+              showDiv('game-grid');
+              console.log('database user is:', doc.data().turn);
+              playerTurn = doc.data().turn;
+              console.log('player turn from db', playerTurn);
+              console.log('doc.data().xuser:', doc.data().xuser);
+              console.log('doc.data().ouser:', doc.data().ouser);
+
+              if (playerTurn === 'xuser') {
+                  setCurrentUser(doc.data().xuser);
+              } else {
+                  setCurrentUser(doc.data().ouser);
+              }
+
+              let idx = getUsersSelectedCell(doc.data().grid);
+              if (idx > 0) {
+                  if (doc.data().turn === 'xuser') {
+                      drawXorO('yuser', `div${idx}`);
+                  } else {
+                      drawXorO('xuser', `div${idx}`);
+                  }
+              }
+
+              if (doc.data().grid) {
+                  cellState = doc.data().grid;
+              }
+
+          }
+      });
+}
+

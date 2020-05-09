@@ -34,19 +34,26 @@
         <a href="#" onclick="createGame()">Create Game</a>
     </div>
 
+    <div id="waiting-div" style="display: none">
+        <span id="waiting-span">Waiting for player to join</span>
+    </div>
     <div id="game-grid" style="display:none;">
         <div> <span id="users-turn"></span> turn</div>
         <div class="grid-container">
-            <div class="grid-item" id="div1" onclick="myFunction('div1')"></div>
-            <div class="grid-item" id="div2" onclick="myFunction('div2')"></div>
-            <div class="grid-item" id="div3" onclick="myFunction('div3')"></div>
-            <div class="grid-item" id="div4" onclick="myFunction('div4')"></div>
-            <div class="grid-item" id="div5" onclick="myFunction('div5')"></div>
-            <div class="grid-item" id="div6" onclick="myFunction('div6')"></div>
-            <div class="grid-item" id="div7" onclick="myFunction('div7')"></div>
-            <div class="grid-item" id="div8" onclick="myFunction('div8')"></div>
-            <div class="grid-item" id="div9" onclick="myFunction('div9')"></div>
+            <div class="grid-item" id="div1" onclick="onClickGameCell('div1')"></div>
+            <div class="grid-item" id="div2" onclick="onClickGameCell('div2')"></div>
+            <div class="grid-item" id="div3" onclick="onClickGameCell('div3')"></div>
+            <div class="grid-item" id="div4" onclick="onClickGameCell('div4')"></div>
+            <div class="grid-item" id="div5" onclick="onClickGameCell('div5')"></div>
+            <div class="grid-item" id="div6" onclick="onClickGameCell('div6')"></div>
+            <div class="grid-item" id="div7" onclick="onClickGameCell('div7')"></div>
+            <div class="grid-item" id="div8" onclick="onClickGameCell('div8')"></div>
+            <div class="grid-item" id="div9" onclick="onClickGameCell('div9')"></div>
         </div>
+    </div>
+
+    <div id="end-game" style="display:none">
+        <span id="end-game-message"></span>
     </div>
 
 </div>
